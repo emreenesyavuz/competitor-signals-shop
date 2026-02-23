@@ -7,6 +7,7 @@ export default function PixelScripts() {
   const tiktokPixelId = process.env.NEXT_PUBLIC_TIKTOK_PIXEL_ID;
   const pinterestTagId = process.env.NEXT_PUBLIC_PINTEREST_TAG_ID;
   const snapPixelId = process.env.NEXT_PUBLIC_SNAP_PIXEL_ID;
+  const redditPixelId = process.env.NEXT_PUBLIC_REDDIT_PIXEL_ID;
 
   return (
     <>
@@ -93,9 +94,20 @@ export default function PixelScripts() {
         </Script>
       )}
 
-      {/* Future platform pixels will be added here:
-          - Reddit Pixel
-      */}
+      {/* ===== REDDIT PIXEL ===== */}
+      {redditPixelId && (
+        <Script id="reddit-pixel" strategy="afterInteractive">
+          {`
+            !function(w,d){if(!w.rdt){var p=w.rdt=function(){p.sendEvent?
+            p.sendEvent.apply(p,arguments):p.callQueue.push(arguments)};
+            p.callQueue=[];var t=d.createElement("script");t.src="https://www.redditstatic.com/ads/pixel.js";
+            t.async=!0;var s=d.getElementsByTagName("script")[0];
+            s.parentNode.insertBefore(t,s)}}(window,document);
+            rdt('init', '${redditPixelId}');
+            rdt('track', 'PageVisit');
+          `}
+        </Script>
+      )}
     </>
   );
 }

@@ -3,6 +3,7 @@ import { sendMetaEvent } from "./meta";
 import { sendTikTokEvent } from "./tiktok";
 import { sendPinterestEvent } from "./pinterest";
 import { sendSnapchatEvent } from "./snapchat";
+import { sendRedditEvent } from "./reddit";
 
 /**
  * Fan-out: sends the event to all configured CAPI endpoints in parallel.
@@ -14,8 +15,7 @@ export async function fanOutCAPI(payload: CAPIPayload): Promise<void> {
     sendTikTokEvent(payload),
     sendPinterestEvent(payload),
     sendSnapchatEvent(payload),
-    // Future platforms will be added here:
-    // sendRedditEvent(payload),
+    sendRedditEvent(payload),
   ]);
 
   for (const result of results) {

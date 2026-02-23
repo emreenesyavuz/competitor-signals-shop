@@ -112,8 +112,24 @@ function trackPixels(
     window.pintrk("track", pinEvent, pinData);
   }
 
-  // Reddit Pixel (will be enabled in a future session)
-  // if (typeof window !== "undefined" && window.rdt) { ... }
+  // Reddit Pixel
+  // PageVisit is handled by rdt('track', 'PageVisit') in the base snippet.
+  if (typeof window !== "undefined" && window.rdt && eventName !== "PageView") {
+    const redditEventMap: Record<string, string> = {
+      ViewContent: "ViewContent",
+      AddToCart: "AddToCart",
+      InitiateCheckout: "Lead",
+      Purchase: "Purchase",
+    };
+    const rdtEvent = redditEventMap[eventName];
+    if (rdtEvent) {
+      const rdtData: Record<string, unknown> = {};
+      if (data?.value) rdtData.value = data.value;
+      if (data?.currency) rdtData.currency = data.currency;
+      if (data?.num_items) rdtData.itemCount = data.num_items;
+      window.rdt("track", rdtEvent, rdtData);
+    }
+  }
 }
 
 async function sendCAPI(
