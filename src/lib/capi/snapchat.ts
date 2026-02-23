@@ -41,7 +41,7 @@ export async function sendSnapchatEvent(payload: CAPIPayload): Promise<void> {
 
   const event: Record<string, unknown> = {
     event_name: mapEventName(payload.eventName),
-    event_time: new Date(payload.eventTime * 1000).toISOString(),
+    event_time: payload.eventTime,
     event_id: payload.eventId,
     event_source_url: payload.sourceUrl,
     action_source: "WEB",
@@ -50,10 +50,13 @@ export async function sendSnapchatEvent(payload: CAPIPayload): Promise<void> {
 
   if (payload.customData) {
     const customData: Record<string, unknown> = {};
-    if (payload.customData.value) customData.price = payload.customData.value;
+    if (payload.customData.value) customData.value = String(payload.customData.value);
     if (payload.customData.currency) customData.currency = payload.customData.currency;
-    if (payload.customData.content_ids) customData.item_ids = payload.customData.content_ids;
-    if (payload.customData.num_items) customData.number_items = payload.customData.num_items;
+    if (payload.customData.content_ids) {
+      customData.contents = (payload.customData.content_ids as string[]).map(
+        (id) => ({ id, quantity: "1" })
+      );
+    }
     event.custom_data = customData;
   }
 
