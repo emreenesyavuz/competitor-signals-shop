@@ -61,8 +61,17 @@ function trackPixels(
   }
 
   // TikTok Pixel
-  if (typeof window !== "undefined" && window.ttq) {
-    window.ttq.track(eventName, data);
+  // PageView is already handled by ttq.page() in the base snippet -- skip it here.
+  // TikTok uses different event names for some standard events.
+  if (typeof window !== "undefined" && window.ttq && eventName !== "PageView") {
+    const tiktokEventMap: Record<string, string> = {
+      ViewContent: "ViewContent",
+      AddToCart: "AddToCart",
+      InitiateCheckout: "InitiateCheckout",
+      Purchase: "CompletePayment",
+    };
+    const ttEvent = tiktokEventMap[eventName] || eventName;
+    window.ttq.track(ttEvent, data);
   }
 
   // Snapchat Pixel (will be enabled in a future session)
