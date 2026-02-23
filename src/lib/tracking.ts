@@ -60,8 +60,10 @@ function trackPixels(
     window.fbq("track", eventName, data, { eventID: eventId });
   }
 
-  // TikTok Pixel (will be enabled in a future session)
-  // if (typeof window !== "undefined" && window.ttq) { ... }
+  // TikTok Pixel
+  if (typeof window !== "undefined" && window.ttq) {
+    window.ttq.track(eventName, data);
+  }
 
   // Snapchat Pixel (will be enabled in a future session)
   // if (typeof window !== "undefined" && window.snaptr) { ... }
