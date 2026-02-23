@@ -60,7 +60,7 @@ export async function sendRedditEvent(payload: CAPIPayload): Promise<void> {
 
   const event: Record<string, unknown> = {
     event_at: eventAtMs,
-    action_source: "web",
+    action_source: "WEBSITE",
     type: {
       tracking_type: trackingType,
     },
