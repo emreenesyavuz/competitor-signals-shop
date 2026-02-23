@@ -77,8 +77,23 @@ function trackPixels(
   // Snapchat Pixel (will be enabled in a future session)
   // if (typeof window !== "undefined" && window.snaptr) { ... }
 
-  // Pinterest Tag (will be enabled in a future session)
-  // if (typeof window !== "undefined" && window.pintrk) { ... }
+  // Pinterest Tag
+  // PageView is handled by pintrk('page') in the base snippet.
+  if (typeof window !== "undefined" && window.pintrk && eventName !== "PageView") {
+    const pinterestEventMap: Record<string, string> = {
+      ViewContent: "pagevisit",
+      AddToCart: "addtocart",
+      InitiateCheckout: "checkout",
+      Purchase: "checkout",
+    };
+    const pinEvent = pinterestEventMap[eventName] || eventName;
+    const pinData: Record<string, unknown> = {};
+    if (data?.value) pinData.value = data.value;
+    if (data?.currency) pinData.order_quantity = data.num_items || 1;
+    if (data?.currency) pinData.currency = data.currency;
+    if (data?.content_ids) pinData.line_items = data.content_ids.map((id) => ({ product_id: id }));
+    window.pintrk("track", pinEvent, pinData);
+  }
 
   // Reddit Pixel (will be enabled in a future session)
   // if (typeof window !== "undefined" && window.rdt) { ... }
