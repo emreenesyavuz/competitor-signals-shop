@@ -44,7 +44,6 @@ export async function sendRedditEvent(payload: CAPIPayload): Promise<void> {
       tracking_type: mapEventName(payload.eventName),
     },
     user: buildUserData(payload),
-    conversion_id: payload.eventId,
   };
 
   if (payload.customData) {
