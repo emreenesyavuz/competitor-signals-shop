@@ -62,7 +62,6 @@ function trackPixels(
 
   // TikTok Pixel
   // PageView is already handled by ttq.page() in the base snippet -- skip it here.
-  // TikTok uses different event names for some standard events.
   if (typeof window !== "undefined" && window.ttq && eventName !== "PageView") {
     const tiktokEventMap: Record<string, string> = {
       ViewContent: "ViewContent",
@@ -71,7 +70,7 @@ function trackPixels(
       Purchase: "CompletePayment",
     };
     const ttEvent = tiktokEventMap[eventName] || eventName;
-    window.ttq.track(ttEvent, data);
+    window.ttq.track(ttEvent, { ...data, event_id: eventId });
   }
 
   // Snapchat Pixel
@@ -85,7 +84,7 @@ function trackPixels(
     };
     const snapEvent = snapEventMap[eventName];
     if (snapEvent) {
-      const snapData: Record<string, unknown> = {};
+      const snapData: Record<string, unknown> = { event_id: eventId };
       if (data?.value) snapData.price = data.value;
       if (data?.currency) snapData.currency = data.currency;
       if (data?.content_ids) snapData.item_ids = data.content_ids;
@@ -104,7 +103,7 @@ function trackPixels(
       Purchase: "checkout",
     };
     const pinEvent = pinterestEventMap[eventName] || eventName;
-    const pinData: Record<string, unknown> = {};
+    const pinData: Record<string, unknown> = { event_id: eventId };
     if (data?.value) pinData.value = data.value;
     if (data?.currency) pinData.order_quantity = data.num_items || 1;
     if (data?.currency) pinData.currency = data.currency;
@@ -123,7 +122,7 @@ function trackPixels(
     };
     const rdtEvent = redditEventMap[eventName];
     if (rdtEvent) {
-      const rdtData: Record<string, unknown> = {};
+      const rdtData: Record<string, unknown> = { conversionId: eventId };
       if (data?.value) rdtData.value = data.value;
       if (data?.currency) rdtData.currency = data.currency;
       if (data?.num_items) rdtData.itemCount = data.num_items;

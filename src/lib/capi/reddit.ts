@@ -1,7 +1,6 @@
 import { CAPIPayload } from "@/types";
 import { createHash } from "crypto";
 
-const AD_ACCOUNT_ID = process.env.REDDIT_AD_ACCOUNT_ID;
 const ACCESS_TOKEN = process.env.REDDIT_ACCESS_TOKEN;
 const PIXEL_ID = process.env.NEXT_PUBLIC_REDDIT_PIXEL_ID;
 
@@ -35,37 +34,32 @@ function buildUserData(payload: CAPIPayload) {
 }
 
 export async function sendRedditEvent(payload: CAPIPayload): Promise<void> {
-  if (!AD_ACCOUNT_ID || !ACCESS_TOKEN || !PIXEL_ID) return;
+  if (!ACCESS_TOKEN || !PIXEL_ID) return;
 
-  const url = `https://ads-api.reddit.com/api/v3/conversions/events/${AD_ACCOUNT_ID}`;
+  const url = `https://ads-api.reddit.com/api/v3/pixels/${PIXEL_ID}/conversion_events`;
 
   const event: Record<string, unknown> = {
-    event_at: new Date(payload.eventTime * 1000).toISOString(),
-    event_type: {
+    event_at: payload.eventTime * 1000,
+    action_source: "web",
+    type: {
       tracking_type: mapEventName(payload.eventName),
     },
     user: buildUserData(payload),
-    event_metadata: {
-      item_count: 0,
-      currency: "USD",
-      value_decimal: 0,
-    },
+    conversion_id: payload.eventId,
   };
 
-  if (payload.sourceUrl) {
-    (event.event_metadata as Record<string, unknown>).page_url = payload.sourceUrl;
-  }
-
   if (payload.customData) {
-    const meta = event.event_metadata as Record<string, unknown>;
+    const meta: Record<string, unknown> = {};
     if (payload.customData.value) meta.value_decimal = payload.customData.value;
     if (payload.customData.currency) meta.currency = payload.customData.currency;
     if (payload.customData.num_items) meta.item_count = payload.customData.num_items;
+    if (payload.sourceUrl) meta.page_url = payload.sourceUrl;
     if (payload.customData.content_ids) {
       meta.products = (payload.customData.content_ids as string[]).map(
         (id) => ({ id })
       );
     }
+    event.event_metadata = meta;
   }
 
   const response = await fetch(url, {
@@ -75,9 +69,9 @@ export async function sendRedditEvent(payload: CAPIPayload): Promise<void> {
       Authorization: `Bearer ${ACCESS_TOKEN}`,
     },
     body: JSON.stringify({
-      events: [event],
-      test_mode: false,
-      partner: "",
+      data: {
+        events: [event],
+      },
     }),
   });
 
