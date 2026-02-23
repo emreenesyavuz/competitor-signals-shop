@@ -53,31 +53,7 @@ export async function sendRedditEvent(payload: CAPIPayload): Promise<void> {
     type: {
       tracking_type: mapEventName(payload.eventName),
     },
-    user: buildUserData(payload),
   };
-
-  const trackingType = mapEventName(payload.eventName);
-  const eventAtMs = payload.eventTime * 1000;
-  const metaValue = String(payload.customData?.value || "");
-  const ip = payload.clientIpAddress || "unknown";
-
-  const meta: Record<string, unknown> = {
-    conversion_id: generateConversionId(eventAtMs, trackingType, metaValue, ip),
-  };
-
-  if (payload.customData) {
-    if (payload.customData.value) meta.value_decimal = payload.customData.value;
-    if (payload.customData.currency) meta.currency = payload.customData.currency;
-    if (payload.customData.num_items) meta.item_count = payload.customData.num_items;
-    if (payload.sourceUrl) meta.page_url = payload.sourceUrl;
-    if (payload.customData.content_ids) {
-      meta.products = (payload.customData.content_ids as string[]).map(
-        (id) => ({ id })
-      );
-    }
-  }
-
-  event.event_metadata = meta;
 
   const response = await fetch(url, {
     method: "POST",
