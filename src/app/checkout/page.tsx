@@ -10,6 +10,7 @@ export default function CheckoutPage() {
   const { items, totalPrice, clearCart } = useCart();
   const router = useRouter();
   const [submitting, setSubmitting] = useState(false);
+  const [orderPlaced, setOrderPlaced] = useState(false);
 
   useTrackPageView({
     eventName: "InitiateCheckout",
@@ -20,7 +21,7 @@ export default function CheckoutPage() {
     },
   });
 
-  if (items.length === 0) {
+  if (items.length === 0 && !submitting && !orderPlaced) {
     router.push("/cart");
     return null;
   }
@@ -29,19 +30,19 @@ export default function CheckoutPage() {
     e.preventDefault();
     setSubmitting(true);
 
-    // Simulate payment processing
-    await new Promise((r) => setTimeout(r, 1500));
-
     const form = e.currentTarget;
     const formData = new FormData(form);
+    const orderTotal = totalPrice.toFixed(2);
+    const orderItemIds = items.map((i) => i.product.id);
+    const orderItemCount = items.length;
 
     trackEvent({
       eventName: "Purchase",
       data: {
         value: totalPrice,
         currency: "USD",
-        num_items: items.length,
-        content_ids: items.map((i) => i.product.id),
+        num_items: orderItemCount,
+        content_ids: orderItemIds,
       },
       userData: {
         email: formData.get("email") as string,
@@ -55,8 +56,9 @@ export default function CheckoutPage() {
       },
     });
 
+    setOrderPlaced(true);
     clearCart();
-    router.push(`/thank-you?total=${totalPrice.toFixed(2)}`);
+    router.push(`/thank-you?total=${orderTotal}`);
   }
 
   return (
