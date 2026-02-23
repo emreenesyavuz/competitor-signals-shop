@@ -6,6 +6,7 @@ export default function PixelScripts() {
   const metaPixelId = process.env.NEXT_PUBLIC_META_PIXEL_ID;
   const tiktokPixelId = process.env.NEXT_PUBLIC_TIKTOK_PIXEL_ID;
   const pinterestTagId = process.env.NEXT_PUBLIC_PINTEREST_TAG_ID;
+  const snapPixelId = process.env.NEXT_PUBLIC_SNAP_PIXEL_ID;
 
   return (
     <>
@@ -76,8 +77,23 @@ export default function PixelScripts() {
         </Script>
       )}
 
+      {/* ===== SNAPCHAT PIXEL ===== */}
+      {snapPixelId && (
+        <Script id="snap-pixel" strategy="afterInteractive">
+          {`
+            (function(e,t,n){if(e.snaptr)return;var a=e.snaptr=function()
+            {a.handleRequest?a.handleRequest.apply(a,arguments):a.queue.push(arguments)};
+            a.queue=[];var s='script';r=t.createElement(s);r.async=!0;
+            r.src=n;var u=t.getElementsByTagName(s)[0];
+            u.parentNode.insertBefore(r,u);})(window,document,
+            'https://sc-static.net/scevent.min.js');
+            snaptr('init', '${snapPixelId}', {});
+            snaptr('track', 'PAGE_VIEW');
+          `}
+        </Script>
+      )}
+
       {/* Future platform pixels will be added here:
-          - Snapchat Pixel
           - Reddit Pixel
       */}
     </>

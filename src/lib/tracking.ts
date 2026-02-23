@@ -74,8 +74,25 @@ function trackPixels(
     window.ttq.track(ttEvent, data);
   }
 
-  // Snapchat Pixel (will be enabled in a future session)
-  // if (typeof window !== "undefined" && window.snaptr) { ... }
+  // Snapchat Pixel
+  // PAGE_VIEW is handled by snaptr('track', 'PAGE_VIEW') in the base snippet.
+  if (typeof window !== "undefined" && window.snaptr && eventName !== "PageView") {
+    const snapEventMap: Record<string, string> = {
+      ViewContent: "VIEW_CONTENT",
+      AddToCart: "ADD_CART",
+      InitiateCheckout: "START_CHECKOUT",
+      Purchase: "PURCHASE",
+    };
+    const snapEvent = snapEventMap[eventName];
+    if (snapEvent) {
+      const snapData: Record<string, unknown> = {};
+      if (data?.value) snapData.price = data.value;
+      if (data?.currency) snapData.currency = data.currency;
+      if (data?.content_ids) snapData.item_ids = data.content_ids;
+      if (data?.num_items) snapData.number_items = data.num_items;
+      window.snaptr("track", snapEvent, snapData);
+    }
+  }
 
   // Pinterest Tag
   // PageView is handled by pintrk('page') in the base snippet.
