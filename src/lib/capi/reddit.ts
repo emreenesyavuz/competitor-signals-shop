@@ -27,7 +27,6 @@ function buildUserData(payload: CAPIPayload) {
 
   if (user?.email) ud.em = sha256(user.email);
 
-  if (payload.clientIpAddress) ud.client_ip_address = payload.clientIpAddress;
   if (payload.userAgent) ud.user_agent = payload.userAgent;
 
   return ud;
