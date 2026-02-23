@@ -8,6 +8,11 @@ function randomDelay(minMs = 1000, maxMs = 3000): number {
   return Math.floor(Math.random() * (maxMs - minMs + 1)) + minMs;
 }
 
+function randomIp(): string {
+  const octet = () => Math.floor(Math.random() * 223) + 1; // 1-223 to avoid reserved ranges
+  return `${octet()}.${Math.floor(Math.random() * 256)}.${Math.floor(Math.random() * 256)}.${Math.floor(Math.random() * 254) + 1}`;
+}
+
 function pickRandomProducts(count: number): number[] {
   const ids = Array.from({ length: PRODUCT_COUNT }, (_, i) => i + 1);
   for (let i = ids.length - 1; i > 0; i--) {
@@ -29,6 +34,7 @@ async function run() {
   const numProducts = Math.floor(Math.random() * 3) + 1; // 1-3 products
   const productIds = pickRandomProducts(numProducts);
 
+  const fakeIp = randomIp();
   const user = {
     firstName: faker.person.firstName(),
     lastName: faker.person.lastName(),
@@ -42,6 +48,7 @@ async function run() {
 
   console.log(`\n--- Fake Traffic Run ---`);
   console.log(`Site:     ${SITE_URL}`);
+  console.log(`IP:       ${fakeIp}`);
   console.log(`Products: ${productIds.join(", ")} (${numProducts} items)`);
   console.log(`User:     ${user.firstName} ${user.lastName} <${user.email}>`);
   console.log(`Address:  ${user.address}, ${user.city}, ${user.state} ${user.zip}\n`);
@@ -52,6 +59,18 @@ async function run() {
     viewport: { width: 1280, height: 720 },
   });
   const page = await context.newPage();
+
+  // Intercept CAPI calls to inject the random IP into the request body
+  await page.route("**/api/capi", async (route) => {
+    const request = route.request();
+    try {
+      const body = JSON.parse(request.postData() || "{}");
+      body.clientIpAddress = fakeIp;
+      await route.continue({ postData: JSON.stringify(body) });
+    } catch {
+      await route.continue();
+    }
+  });
 
   try {
     // 1. Visit homepage
