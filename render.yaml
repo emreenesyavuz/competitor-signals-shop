@@ -1,0 +1,34 @@
+services:
+  - type: web
+    runtime: node
+    name: competitor-signals-shop
+    plan: free
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NEXT_PUBLIC_META_PIXEL_ID
+        sync: false
+      - key: META_ACCESS_TOKEN
+        sync: false
+      - key: NEXT_PUBLIC_TIKTOK_PIXEL_ID
+        sync: false
+      - key: TIKTOK_ACCESS_TOKEN
+        sync: false
+      - key: NEXT_PUBLIC_SNAP_PIXEL_ID
+        sync: false
+      - key: SNAP_ACCESS_TOKEN
+        sync: false
+      - key: NEXT_PUBLIC_PINTEREST_TAG_ID
+        sync: false
+      - key: PINTEREST_AD_ACCOUNT_ID
+        sync: false
+      - key: PINTEREST_ACCESS_TOKEN
+        sync: false
+      - key: NEXT_PUBLIC_REDDIT_PIXEL_ID
+        sync: false
+      - key: REDDIT_AD_ACCOUNT_ID
+        sync: false
+      - key: REDDIT_ACCESS_TOKEN
+        sync: false
