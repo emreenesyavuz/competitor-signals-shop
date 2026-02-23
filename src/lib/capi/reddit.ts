@@ -31,28 +31,41 @@ function mapEventName(eventName: string): string {
   return map[eventName] || eventName;
 }
 
-function buildUserData(payload: CAPIPayload) {
-  const ud: Record<string, unknown> = {};
-  const user = payload.userData;
-
-  if (user?.email) ud.em = sha256(user.email);
-
-  if (payload.userAgent) ud.user_agent = payload.userAgent;
-
-  return ud;
-}
-
 export async function sendRedditEvent(payload: CAPIPayload): Promise<void> {
   if (!ACCESS_TOKEN || !PIXEL_ID) return;
 
   const url = `https://ads-api.reddit.com/api/v3/pixels/${PIXEL_ID}/conversion_events`;
 
+  const trackingType = mapEventName(payload.eventName);
+  const eventAtMs = payload.eventTime * 1000;
+  const metaValue = String(payload.customData?.value || "");
+  const ip = payload.clientIpAddress || "unknown";
+
+  const user: Record<string, unknown> = {};
+  if (payload.userData?.email) user.email = sha256(payload.userData.email);
+  if (payload.clientIpAddress) user.ip_address = sha256(payload.clientIpAddress);
+  if (payload.userAgent) user.user_agent = payload.userAgent;
+
+  const metadata: Record<string, unknown> = {
+    conversion_id: generateConversionId(eventAtMs, trackingType, metaValue, ip),
+  };
+  if (payload.customData?.value) metadata.value = payload.customData.value;
+  if (payload.customData?.currency) metadata.currency = payload.customData.currency;
+  if (payload.customData?.num_items) metadata.item_count = payload.customData.num_items;
+  if (payload.customData?.content_ids) {
+    metadata.products = (payload.customData.content_ids as string[]).map(
+      (id) => ({ id })
+    );
+  }
+
   const event: Record<string, unknown> = {
-    event_at: payload.eventTime * 1000,
+    event_at: eventAtMs,
     action_source: "web",
     type: {
-      tracking_type: mapEventName(payload.eventName),
+      tracking_type: trackingType,
     },
+    user,
+    metadata,
   };
 
   const response = await fetch(url, {
