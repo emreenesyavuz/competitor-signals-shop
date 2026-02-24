@@ -25,7 +25,6 @@ export default function PixelScripts() {
               s.parentNode.insertBefore(t,s)}(window, document,'script',
               'https://connect.facebook.net/en_US/fbevents.js');
               fbq('init', '${metaPixelId}');
-              fbq('track', 'PageView');
             `}
           </Script>
           <noscript>
@@ -56,7 +55,6 @@ export default function PixelScripts() {
               var a=document.createElement("script");a.type="text/javascript";a.async=!0;a.src=r+"?sdkid="+e+"&lib="+t;
               var s=document.getElementsByTagName("script")[0];s.parentNode.insertBefore(a,s)};
               ttq.load('${tiktokPixelId}');
-              ttq.page();
             }(window, document, 'ttq');
           `}
         </Script>
@@ -73,7 +71,6 @@ export default function PixelScripts() {
             r=document.getElementsByTagName("script")[0];
             r.parentNode.insertBefore(t,r)}}("https://s.pinimg.com/ct/core.js");
             pintrk('load', '${pinterestTagId}');
-            pintrk('page');
           `}
         </Script>
       )}
@@ -89,7 +86,6 @@ export default function PixelScripts() {
             u.parentNode.insertBefore(r,u);})(window,document,
             'https://sc-static.net/scevent.min.js');
             snaptr('init', '${snapPixelId}', {});
-            snaptr('track', 'PAGE_VIEW');
           `}
         </Script>
       )}
@@ -104,7 +100,6 @@ export default function PixelScripts() {
             t.async=!0;var s=d.getElementsByTagName("script")[0];
             s.parentNode.insertBefore(t,s)}}(window,document);
             rdt('init', '${redditPixelId}');
-            rdt('track', 'PageVisit');
           `}
         </Script>
       )}

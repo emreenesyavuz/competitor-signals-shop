@@ -61,9 +61,9 @@ function trackPixels(
   }
 
   // TikTok Pixel
-  // PageView is already handled by ttq.page() in the base snippet -- skip it here.
-  if (typeof window !== "undefined" && window.ttq && eventName !== "PageView") {
+  if (typeof window !== "undefined" && window.ttq) {
     const tiktokEventMap: Record<string, string> = {
+      PageView: "Pageview",
       ViewContent: "ViewContent",
       AddToCart: "AddToCart",
       InitiateCheckout: "InitiateCheckout",
@@ -74,9 +74,9 @@ function trackPixels(
   }
 
   // Snapchat Pixel
-  // PAGE_VIEW is handled by snaptr('track', 'PAGE_VIEW') in the base snippet.
-  if (typeof window !== "undefined" && window.snaptr && eventName !== "PageView") {
+  if (typeof window !== "undefined" && window.snaptr) {
     const snapEventMap: Record<string, string> = {
+      PageView: "PAGE_VIEW",
       ViewContent: "VIEW_CONTENT",
       AddToCart: "ADD_CART",
       InitiateCheckout: "START_CHECKOUT",
@@ -94,9 +94,9 @@ function trackPixels(
   }
 
   // Pinterest Tag
-  // PageView is handled by pintrk('page') in the base snippet.
-  if (typeof window !== "undefined" && window.pintrk && eventName !== "PageView") {
+  if (typeof window !== "undefined" && window.pintrk) {
     const pinterestEventMap: Record<string, string> = {
+      PageView: "page",
       ViewContent: "pagevisit",
       AddToCart: "addtocart",
       InitiateCheckout: "checkout",
@@ -112,9 +112,9 @@ function trackPixels(
   }
 
   // Reddit Pixel
-  // PageVisit is handled by rdt('track', 'PageVisit') in the base snippet.
-  if (typeof window !== "undefined" && window.rdt && eventName !== "PageView") {
+  if (typeof window !== "undefined" && window.rdt) {
     const redditEventMap: Record<string, string> = {
+      PageView: "PageVisit",
       ViewContent: "ViewContent",
       AddToCart: "AddToCart",
       InitiateCheckout: "Lead",
