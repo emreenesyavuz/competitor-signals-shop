@@ -10,15 +10,6 @@ function sha256(value: string): string {
     .digest("hex");
 }
 
-function generateConversionId(
-  eventAt: number,
-  trackingType: string,
-  value: string,
-  ipAddress: string
-): string {
-  const input = `${eventAt}${trackingType}${value}${ipAddress}`;
-  return createHash("sha256").update(input).digest("hex");
-}
 
 function mapEventName(eventName: string): string {
   const map: Record<string, string> = {
@@ -38,8 +29,6 @@ export async function sendRedditEvent(payload: CAPIPayload): Promise<void> {
 
   const trackingType = mapEventName(payload.eventName);
   const eventAtMs = payload.eventTime * 1000;
-  const metaValue = String(payload.customData?.value || "");
-  const ip = payload.clientIpAddress || "unknown";
 
   const user: Record<string, unknown> = {};
   if (payload.userData?.email) user.email = sha256(payload.userData.email);
@@ -47,7 +36,7 @@ export async function sendRedditEvent(payload: CAPIPayload): Promise<void> {
   if (payload.userAgent) user.user_agent = payload.userAgent;
 
   const metadata: Record<string, unknown> = {
-    conversion_id: generateConversionId(eventAtMs, trackingType, metaValue, ip),
+    conversion_id: payload.eventId,
   };
   if (payload.customData?.value) metadata.value = payload.customData.value;
   if (payload.customData?.currency) metadata.currency = payload.customData.currency;
