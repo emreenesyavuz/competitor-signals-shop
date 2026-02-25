@@ -17,6 +17,7 @@ function buildUserData(payload: CAPIPayload) {
   if (user?.email) ud.email = sha256(user.email);
   if (user?.phone) ud.phone = sha256(user.phone);
 
+  if (payload.externalId) ud.external_id = sha256(payload.externalId);
   if (payload.clientIpAddress) ud.ip = payload.clientIpAddress;
   if (payload.userAgent) ud.user_agent = payload.userAgent;
 

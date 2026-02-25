@@ -31,6 +31,7 @@ export interface TrackingEvent {
 export interface CAPIPayload {
   eventName: string;
   eventId: string;
+  externalId?: string;
   eventTime: number;
   sourceUrl: string;
   userData?: TrackingEvent["userData"];

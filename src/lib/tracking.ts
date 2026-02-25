@@ -5,11 +5,23 @@ import { v4 as uuidv4 } from "uuid";
 declare global {
   interface Window {
     fbq?: (...args: unknown[]) => void;
-    ttq?: { track: (...args: unknown[]) => void };
+    ttq?: { track: (...args: unknown[]) => void; identify: (data: Record<string, unknown>) => void };
     snaptr?: (...args: unknown[]) => void;
     pintrk?: (...args: unknown[]) => void;
     rdt?: (...args: unknown[]) => void;
   }
+}
+
+const EXTERNAL_ID_KEY = "signalshop_external_id";
+
+function getExternalId(): string {
+  if (typeof window === "undefined") return "";
+  let id = localStorage.getItem(EXTERNAL_ID_KEY);
+  if (!id) {
+    id = uuidv4();
+    localStorage.setItem(EXTERNAL_ID_KEY, id);
+  }
+  return id;
 }
 
 interface TrackingData {
@@ -45,23 +57,29 @@ interface TrackOptions {
  */
 export function trackEvent({ eventName, data, userData }: TrackOptions) {
   const eventId = uuidv4();
+  const externalId = getExternalId();
 
-  trackPixels(eventName, eventId, data);
-  sendCAPI(eventName, eventId, data, userData);
+  trackPixels(eventName, eventId, externalId, data);
+  sendCAPI(eventName, eventId, externalId, data, userData);
 }
 
 function trackPixels(
   eventName: string,
   eventId: string,
+  externalId: string,
   data?: TrackingData
 ) {
   // Meta Pixel
   if (typeof window !== "undefined" && window.fbq) {
-    window.fbq("track", eventName, data, { eventID: eventId });
+    window.fbq("track", eventName, data, {
+      eventID: eventId,
+      external_id: externalId,
+    });
   }
 
   // TikTok Pixel
   if (typeof window !== "undefined" && window.ttq) {
+    window.ttq.identify({ external_id: externalId });
     const tiktokEventMap: Record<string, string> = {
       PageView: "Pageview",
       ViewContent: "ViewContent",
@@ -84,7 +102,10 @@ function trackPixels(
     };
     const snapEvent = snapEventMap[eventName];
     if (snapEvent) {
-      const snapData: Record<string, unknown> = { event_id: eventId };
+      const snapData: Record<string, unknown> = {
+        event_id: eventId,
+        user_data: { external_id: externalId },
+      };
       if (data?.value) snapData.price = data.value;
       if (data?.currency) snapData.currency = data.currency;
       if (data?.content_ids) snapData.item_ids = data.content_ids;
@@ -132,6 +153,7 @@ function trackPixels(
 async function sendCAPI(
   eventName: string,
   eventId: string,
+  externalId: string,
   data?: TrackingData,
   userData?: TrackOptions["userData"]
 ) {
@@ -142,6 +164,7 @@ async function sendCAPI(
       body: JSON.stringify({
         eventName,
         eventId,
+        externalId,
         eventTime: Math.floor(Date.now() / 1000),
         sourceUrl: typeof window !== "undefined" ? window.location.href : "",
         userData,

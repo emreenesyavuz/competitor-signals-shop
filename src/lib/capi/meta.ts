@@ -24,6 +24,7 @@ function buildUserData(payload: CAPIPayload) {
   if (user?.zip) ud.zp = [sha256(user.zip)];
   if (user?.country) ud.country = [sha256(user.country)];
 
+  if (payload.externalId) ud.external_id = [sha256(payload.externalId)];
   if (payload.clientIpAddress) ud.client_ip_address = payload.clientIpAddress;
   if (payload.userAgent) ud.client_user_agent = payload.userAgent;
 
