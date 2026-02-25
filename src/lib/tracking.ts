@@ -97,9 +97,7 @@ function trackPixels(
   if (typeof window !== "undefined" && window.pintrk) {
     const pinterestEventMap: Record<string, string> = {
       PageView: "page",
-      ViewContent: "pagevisit",
       AddToCart: "addtocart",
-      InitiateCheckout: "checkout",
       Purchase: "checkout",
     };
     const pinEvent = pinterestEventMap[eventName] || eventName;

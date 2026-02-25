@@ -13,12 +13,10 @@ function sha256(value: string): string {
 function mapEventName(eventName: string): string {
   const map: Record<string, string> = {
     PageView: "page_visit",
-    ViewContent: "page_visit",
     AddToCart: "add_to_cart",
-    InitiateCheckout: "checkout",
     Purchase: "checkout",
   };
-  return map[eventName] || eventName;
+  return map[eventName] || "";
 }
 
 function buildUserData(payload: CAPIPayload) {
@@ -54,10 +52,13 @@ function buildUserData(payload: CAPIPayload) {
 export async function sendPinterestEvent(payload: CAPIPayload): Promise<void> {
   if (!AD_ACCOUNT_ID || !ACCESS_TOKEN) return;
 
+  const mappedEvent = mapEventName(payload.eventName);
+  if (!mappedEvent) return;
+
   const url = `https://api.pinterest.com/v5/ad_accounts/${AD_ACCOUNT_ID}/events`;
 
   const event: Record<string, unknown> = {
-    event_name: mapEventName(payload.eventName),
+    event_name: mappedEvent,
     action_source: "web",
     event_time: payload.eventTime,
     event_id: payload.eventId,
