@@ -59,7 +59,7 @@ export function trackEvent({ eventName, data, userData }: TrackOptions) {
   const eventId = uuidv4();
   const externalId = getExternalId();
 
-  trackPixels(eventName, eventId, externalId, data);
+  trackPixels(eventName, eventId, externalId, data, userData);
   sendCAPI(eventName, eventId, externalId, data, userData);
 }
 
@@ -67,7 +67,8 @@ function trackPixels(
   eventName: string,
   eventId: string,
   externalId: string,
-  data?: TrackingData
+  data?: TrackingData,
+  userData?: TrackOptions["userData"]
 ) {
   // Meta Pixel
   if (typeof window !== "undefined" && window.fbq) {
@@ -145,6 +146,7 @@ function trackPixels(
         conversionId: eventId,
         externalId: externalId,
       };
+      if (userData?.email) rdtData.email = userData.email.trim().toLowerCase();
       if (data?.value) rdtData.value = data.value;
       if (data?.currency) rdtData.currency = data.currency;
       if (data?.num_items) rdtData.itemCount = data.num_items;
