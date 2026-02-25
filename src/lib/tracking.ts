@@ -141,7 +141,10 @@ function trackPixels(
     };
     const rdtEvent = redditEventMap[eventName];
     if (rdtEvent) {
-      const rdtData: Record<string, unknown> = { conversionId: eventId };
+      const rdtData: Record<string, unknown> = {
+        conversionId: eventId,
+        externalId: externalId,
+      };
       if (data?.value) rdtData.value = data.value;
       if (data?.currency) rdtData.currency = data.currency;
       if (data?.num_items) rdtData.itemCount = data.num_items;
