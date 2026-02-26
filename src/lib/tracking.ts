@@ -147,6 +147,7 @@ function trackPixels(
         externalId: externalId,
       };
       if (userData?.email) rdtData.email = userData.email.trim().toLowerCase();
+      if (userData?.phone) rdtData.phone = userData.phone.replace(/\D/g, "");
       if (data?.value) rdtData.value = data.value;
       if (data?.currency) rdtData.currency = data.currency;
       if (data?.num_items) rdtData.itemCount = data.num_items;
