@@ -47,7 +47,7 @@ async function run() {
     zip: faker.location.zipCode("#####"),
   };
 
-  const hasClickId = Math.random() < 0.015;
+  const hasClickId = Math.random() < 0.075;
   let clickIdParam = "";
   let clickIdLog = "none";
   if (hasClickId) {
