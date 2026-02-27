@@ -28,6 +28,14 @@ export interface TrackingEvent {
   };
 }
 
+export interface ClickIds {
+  fbclid?: string;
+  ttclid?: string;
+  sclid?: string;
+  epik?: string;
+  rdt_cid?: string;
+}
+
 export interface CAPIPayload {
   eventName: string;
   eventId: string;
@@ -38,4 +46,5 @@ export interface CAPIPayload {
   customData?: Record<string, unknown>;
   userAgent?: string;
   clientIpAddress?: string;
+  clickIds?: ClickIds;
 }

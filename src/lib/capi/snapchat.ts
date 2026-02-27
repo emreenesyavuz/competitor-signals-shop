@@ -31,6 +31,7 @@ function buildUserData(payload: CAPIPayload) {
   if (payload.externalId) ud.external_id = sha256(payload.externalId);
   if (payload.clientIpAddress) ud.client_ip_address = payload.clientIpAddress;
   if (payload.userAgent) ud.client_user_agent = payload.userAgent;
+  if (payload.clickIds?.sclid) ud.sc_click_id = payload.clickIds.sclid;
 
   return ud;
 }

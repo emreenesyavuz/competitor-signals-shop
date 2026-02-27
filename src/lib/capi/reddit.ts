@@ -35,6 +35,7 @@ export async function sendRedditEvent(payload: CAPIPayload): Promise<void> {
   if (payload.externalId) user.external_id = sha256(payload.externalId);
   if (payload.clientIpAddress) user.ip_address = sha256(payload.clientIpAddress);
   if (payload.userAgent) user.user_agent = payload.userAgent;
+  if (payload.clickIds?.rdt_cid) user.click_id = payload.clickIds.rdt_cid;
 
   const metadata: Record<string, unknown> = {
     conversion_id: payload.eventId,

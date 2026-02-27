@@ -46,6 +46,7 @@ function buildUserData(payload: CAPIPayload) {
   if (payload.externalId && ud.length > 0) ud[0].external_id = [sha256(payload.externalId)];
   if (payload.clientIpAddress && ud.length > 0) ud[0].client_ip_address = payload.clientIpAddress;
   if (payload.userAgent && ud.length > 0) ud[0].client_user_agent = payload.userAgent;
+  if (payload.clickIds?.epik && ud.length > 0) ud[0].click_id = payload.clickIds.epik;
 
   return ud.length > 0 ? ud : [{ client_ip_address: payload.clientIpAddress, client_user_agent: payload.userAgent }];
 }
