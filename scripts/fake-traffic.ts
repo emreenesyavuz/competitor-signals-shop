@@ -47,10 +47,28 @@ async function run() {
     zip: faker.location.zipCode("#####"),
   };
 
+  const hasClickId = Math.random() < 0.015;
+  let clickIdParam = "";
+  let clickIdLog = "none";
+  if (hasClickId) {
+    const platforms = [
+      { param: "fbclid", gen: () => faker.string.alphanumeric(40) },
+      { param: "ttclid", gen: () => faker.string.alphanumeric(32) },
+      { param: "sclid", gen: () => faker.string.uuid() },
+      { param: "epik", gen: () => `dj0yJnU9${faker.string.alphanumeric(30)}` },
+      { param: "rdt_cid", gen: () => faker.string.alphanumeric(24) },
+    ];
+    const platform = platforms[Math.floor(Math.random() * platforms.length)];
+    const value = platform.gen();
+    clickIdParam = `?${platform.param}=${value}`;
+    clickIdLog = `${platform.param}=${value}`;
+  }
+
   console.log(`\n--- Fake Traffic Run ---`);
   console.log(`Site:     ${SITE_URL}`);
   console.log(`IP:       ${fakeIp}`);
   console.log(`ExtID:    ${fakeExternalId}`);
+  console.log(`ClickID:  ${clickIdLog}`);
   console.log(`Products: ${productIds.join(", ")} (${numProducts} items)`);
   console.log(`User:     ${user.firstName} ${user.lastName} <${user.email}>`);
   console.log(`Address:  ${user.address}, ${user.city}, ${user.state} ${user.zip}\n`);
@@ -80,9 +98,9 @@ async function run() {
   });
 
   try {
-    // 1. Visit homepage
+    // 1. Visit homepage (with click ID param if this is an "ad click" visit)
     console.log("[1/7] Visiting homepage...");
-    await page.goto(SITE_URL, { waitUntil: "domcontentloaded", timeout: 60000 });
+    await page.goto(`${SITE_URL}${clickIdParam}`, { waitUntil: "domcontentloaded", timeout: 60000 });
     await waitForPageReady(page);
     await sleep(randomDelay());
 
