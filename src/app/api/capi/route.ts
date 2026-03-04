@@ -9,7 +9,6 @@ export async function POST(request: NextRequest) {
     const payload: CAPIPayload = {
       eventName: body.eventName,
       eventId: body.eventId,
-      externalId: body.externalId,
       eventTime: body.eventTime || Math.floor(Date.now() / 1000),
       sourceUrl: body.sourceUrl || "",
       userData: body.userData,

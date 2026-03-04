@@ -20,18 +20,7 @@ interface ClickIds {
   rdt_cid?: string;
 }
 
-const EXTERNAL_ID_KEY = "signalshop_external_id";
 const CLICK_ID_KEYS: (keyof ClickIds)[] = ["fbclid", "ttclid", "sclid", "epik", "rdt_cid"];
-
-function getExternalId(): string {
-  if (typeof window === "undefined") return "";
-  let id = localStorage.getItem(EXTERNAL_ID_KEY);
-  if (!id) {
-    id = uuidv4();
-    localStorage.setItem(EXTERNAL_ID_KEY, id);
-  }
-  return id;
-}
 
 function captureClickIds(): void {
   if (typeof window === "undefined") return;
@@ -85,27 +74,23 @@ interface TrackOptions {
  */
 export function trackEvent({ eventName, data, userData }: TrackOptions) {
   const eventId = uuidv4();
-  const externalId = getExternalId();
   captureClickIds();
   const clickIds = getClickIds();
 
-  trackPixels(eventName, eventId, externalId, clickIds, data, userData);
-  sendCAPI(eventName, eventId, externalId, clickIds, data, userData);
+  trackPixels(eventName, eventId, clickIds, data, userData);
+  sendCAPI(eventName, eventId, clickIds, data, userData);
 }
 
 function trackPixels(
   eventName: string,
   eventId: string,
-  externalId: string,
   clickIds: ClickIds,
   data?: TrackingData,
   userData?: TrackOptions["userData"]
 ) {
-  // Meta Pixel (auto-reads fbclid from URL, but we pass fbc if available)
   if (typeof window !== "undefined" && window.fbq) {
     const metaOpts: Record<string, unknown> = {
       eventID: eventId,
-      external_id: externalId,
     };
     if (clickIds.fbclid) {
       metaOpts.fbc = `fb.1.${Date.now()}.${clickIds.fbclid}`;
@@ -113,11 +98,10 @@ function trackPixels(
     window.fbq("track", eventName, data, metaOpts);
   }
 
-  // TikTok Pixel
   if (typeof window !== "undefined" && window.ttq) {
-    const identifyData: Record<string, unknown> = { external_id: externalId };
+    const identifyData: Record<string, unknown> = {};
     if (clickIds.ttclid) identifyData.ttclid = clickIds.ttclid;
-    window.ttq.identify(identifyData);
+    if (Object.keys(identifyData).length > 0) window.ttq.identify(identifyData);
     const tiktokEventMap: Record<string, string> = {
       PageView: "Pageview",
       ViewContent: "ViewContent",
@@ -140,7 +124,7 @@ function trackPixels(
     };
     const snapEvent = snapEventMap[eventName];
     if (snapEvent) {
-      const snapUserData: Record<string, unknown> = { external_id: externalId };
+      const snapUserData: Record<string, unknown> = {};
       if (clickIds.sclid) snapUserData.sc_click_id = clickIds.sclid;
       const snapData: Record<string, unknown> = {
         event_id: eventId,
@@ -184,7 +168,6 @@ function trackPixels(
     if (rdtEvent) {
       const rdtData: Record<string, unknown> = {
         conversionId: eventId,
-        externalId: externalId,
       };
       if (clickIds.rdt_cid) rdtData.clickId = clickIds.rdt_cid;
       if (userData?.email) rdtData.email = userData.email.trim().toLowerCase();
@@ -200,7 +183,6 @@ function trackPixels(
 async function sendCAPI(
   eventName: string,
   eventId: string,
-  externalId: string,
   clickIds: ClickIds,
   data?: TrackingData,
   userData?: TrackOptions["userData"]
@@ -212,7 +194,6 @@ async function sendCAPI(
       body: JSON.stringify({
         eventName,
         eventId,
-        externalId,
         clickIds,
         eventTime: Math.floor(Date.now() / 1000),
         sourceUrl: typeof window !== "undefined" ? window.location.href : "",

@@ -35,7 +35,6 @@ async function run() {
   const productIds = pickRandomProducts(numProducts);
 
   const fakeIp = randomIp();
-  const fakeExternalId = faker.string.uuid();
   const user = {
     firstName: faker.person.firstName(),
     lastName: faker.person.lastName(),
@@ -67,7 +66,6 @@ async function run() {
   console.log(`\n--- Fake Traffic Run ---`);
   console.log(`Site:     ${SITE_URL}`);
   console.log(`IP:       ${fakeIp}`);
-  console.log(`ExtID:    ${fakeExternalId}`);
   console.log(`ClickID:  ${clickIdLog}`);
   console.log(`Products: ${productIds.join(", ")} (${numProducts} items)`);
   console.log(`User:     ${user.firstName} ${user.lastName} <${user.email}>`);
@@ -79,11 +77,6 @@ async function run() {
     viewport: { width: 1280, height: 720 },
   });
   const page = await context.newPage();
-
-  // Pre-seed the external ID in localStorage before any page loads
-  await context.addInitScript((extId: string) => {
-    localStorage.setItem("signalshop_external_id", extId);
-  }, fakeExternalId);
 
   // Intercept CAPI calls to inject the random IP into the request body
   await page.route("**/api/capi", async (route) => {
